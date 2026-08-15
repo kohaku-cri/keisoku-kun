@@ -1,0 +1,11 @@
+{
+  "name": "keisoku-bp",
+  "author": "kohaku",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@minecraft/server": "^2.8.0",
+    "@minecraft/server-ui": "^2.1.0",
+    "archiver": "^5.3.1"
+  }
+}

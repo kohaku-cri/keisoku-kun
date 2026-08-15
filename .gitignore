@@ -1,0 +1,7 @@
+node_modules
+
+# 以下個人的な環境の除外設定
+
+export.bat
+exportFile.js
+.vscode
