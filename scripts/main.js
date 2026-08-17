@@ -85,10 +85,6 @@ const customCommand = [
     run: (ev) => {
       system.run(() => {
         const player = ev.sourceEntity;
-        if (player.typeId === "minecraft:player")
-          return console.error(
-            "このコマンドはプレイヤーが実行する必要があります",
-          );
         countDataForm(player);
       });
     },
