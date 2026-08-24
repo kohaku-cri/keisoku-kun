@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 こはく
+ * MIT License
+ * https://opensource.org/license/mit
+ */
+
 import {
   CommandPermissionLevel,
   CustomCommandOrigin,
