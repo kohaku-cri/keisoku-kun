@@ -147,7 +147,7 @@ system.beforeEvents.startup.subscribe((e) => {
 function doCount() {
   // 重複実行対策
   if (world.getDynamicProperty(ids.countState)) {
-    return console.log("すでに実行されています");
+    return console.err("すでに実行されています");
   }
   world.setDynamicProperty(ids.countState, true);
 
