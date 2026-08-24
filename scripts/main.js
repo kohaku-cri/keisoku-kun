@@ -1,7 +1,6 @@
 import {
   CommandPermissionLevel,
   CustomCommandOrigin,
-  CustomCommandParamType,
   system,
   world,
 } from "@minecraft/server";
@@ -18,8 +17,6 @@ const ids = {
   scoreName: "count", // 他システムとの整合性の考慮は不要
   // 次回起動向けにカウント状態を保存するダイナミックプロパティのID
   countState: "keisoku-1gje3_isCount",
-  // 常時表示するかを保存するダイナミックプロパティのID
-  alwaysShow: "keisoku-4ge23_isAlwaysShow",
   // カウント再開をチャットに送信するかを保存するダイナミックプロパティのID
   notifyAutoResumeOnReload: "keisoku-4ge23_notifyAutoResumeOnReload",
 };
@@ -130,9 +127,8 @@ system.beforeEvents.startup.subscribe((e) => {
       const intervalNum = system.runInterval(() => {
         const player = world.getAllPlayers();
         if (player.length > 0) {
-          world.getDynamicProperty(ids.notifyAutoResumeOnReload)
-            ? worldChat("自動でカウントが再開されました")
-            : null;
+          world.getDynamicProperty(ids.notifyAutoResumeOnReload) &&
+            worldChat("自動でカウントが再開されました");
 
           system.clearRun(intervalNum);
         }
@@ -150,9 +146,8 @@ function doCount() {
     return console.err("すでに実行されています");
   }
   world.setDynamicProperty(ids.countState, true);
-
+  const countBoard = world.scoreboard.getObjective(ids.scoreboardId);
   const intervalId = system.runInterval(() => {
-    const countBoard = world.scoreboard.getObjective(ids.scoreboardId);
     countBoard.addScore(ids.scoreName, 1);
   }, 20);
   isDo.set("intervalId", intervalId);
@@ -200,9 +195,7 @@ function conversionTime(rawNumber) {
 async function settingForm(player) {
   const form = new ModalFormData().title("計測くん");
   form.toggle("再読み込み時にカウントの自動再開をチャットに通知", {
-    defaultValue: world.getDynamicProperty(ids.notifyAutoResumeOnReload)
-      ? true
-      : false,
+    defaultValue: world.getDynamicProperty(ids.notifyAutoResumeOnReload),
   });
   form.divider();
   form.submitButton("設定を保存");
@@ -210,9 +203,8 @@ async function settingForm(player) {
   const res = await form.show(player);
   if (res.canceled) return;
   const isNotifyAutoResumeOnReload = res.formValues[0];
-  if (isNotifyAutoResumeOnReload) {
-    world.setDynamicProperty(ids.notifyAutoResumeOnReload, true);
-  } else {
-    world.setDynamicProperty(ids.notifyAutoResumeOnReload, false);
-  }
+  world.setDynamicProperty(
+    ids.notifyAutoResumeOnReload,
+    isNotifyAutoResumeOnReload,
+  );
 }
