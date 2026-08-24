@@ -106,31 +106,6 @@ const customCommand = [
       });
     },
   },
-  // 常時表示処理※マップシステムとの競合の懸念から非推奨
-  // {
-  //   command: {
-  //     name: `${ids.prefix}:always`,
-  //     description:
-  //       "現在タイムをアクションバーに常に表示する（引数省略の場合はtrue）",
-  //     permissionLevel: CommandPermissionLevel.Admin,
-  //     optionalParameters: [
-  //       { type: CustomCommandParamType.Boolean, name: "表示の有無" },
-  //     ],
-  //   },
-  //   /**
-  //    *
-  //    * @param {CustomCommandOrigin} ev
-  //    */
-  //   run: (ev, arg) => {
-  //     if (arg === true || arg === undefined) {
-  //       world.setDynamicProperty(alwaysShow, true);
-  //       worldChat("常時表示をONにしました");
-  //     } else {
-  //       world.setDynamicProperty(alwaysShow, false);
-  //       worldChat("常時表示をOFFにしました");
-  //     }
-  //   },
-  // },
 ];
 
 // カスタムコマンドの登録
@@ -241,16 +216,3 @@ async function settingForm(player) {
     world.setDynamicProperty(ids.notifyAutoResumeOnReload, false);
   }
 }
-
-// 常時表示処理※マップシステムとの競合の懸念から非推奨
-
-// system.runInterval(() => {
-//   const isAlways = world.getDynamicProperty(ids.alwaysShow);
-//   if (isAlways) {
-//     const countBoard = world.scoreboard.getObjective(ids.scoreboardId);
-//     const nowCount = countBoard.getScore(ids.scoreName);
-//     world
-//       .getDimension("overworld")
-//       .runCommand(`/title @a actionbar ${conversionTime(nowCount)}`);
-//   }
-// }, 0);
