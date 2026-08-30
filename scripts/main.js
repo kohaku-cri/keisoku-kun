@@ -21,7 +21,7 @@ const ids = {
   scoreboardId: "keisoku-iewiojgew4s",
   // 記録用スコア名
   scoreName: "count", // 他システムとの整合性の考慮は不要
-  // 次回起動向けにカウント状態を保存するダイナミックプロパティのID
+  // カウント状態を保存するダイナミックプロパティのID
   countState: "keisoku-1gje3_isCount",
   // カウント再開をチャットに送信するかを保存するダイナミックプロパティのID
   notifyAutoResumeOnReload: "keisoku-4ge23_notifyAutoResumeOnReload",
@@ -29,7 +29,7 @@ const ids = {
   twoStepConfirmed: "keisoku-h7wti_isTwoStepConfirmed",
 };
 
-// デフォルト設定
+// 既定の設定
 system.run(() => {
   if (world.getDynamicProperty(ids.notifyAutoResumeOnReload) === undefined) {
     world.setDynamicProperty(ids.notifyAutoResumeOnReload, true);
@@ -46,36 +46,14 @@ const isDo = new Map();
 const customCommand = [
   {
     command: {
-      name: `${ids.prefix}:start`,
-      description: "計測を開始、再開する",
-      permissionLevel: CommandPermissionLevel.Admin,
-    },
-    run: () => {
-      doCount();
-      worldChat("カウントスタートしました");
-    },
-  },
-  {
-    command: {
-      name: `${ids.prefix}:stop`,
-      description: "計測を停止する",
-      permissionLevel: CommandPermissionLevel.Admin,
-    },
-    run: () => {
-      stopCount();
-      worldChat("カウントストップしました");
-    },
-  },
-  {
-    command: {
-      name: `${ids.prefix}:reset`,
-      description: "現在の経過時間をリセット",
+      name: `${ids.prefix}:menu`,
+      description: "操作画面を開く",
       permissionLevel: CommandPermissionLevel.Admin,
     },
     run: (ev) => {
       system.run(() => {
         const player = ev.sourceEntity;
-        resetForm(player);
+        menuForm(player);
       });
     },
   },
@@ -92,23 +70,6 @@ const customCommand = [
       system.run(() => {
         const player = ev.sourceEntity;
         countDataForm(player);
-      });
-    },
-  },
-  {
-    command: {
-      name: `${ids.prefix}:setting`,
-      description: "アドオンの設定を開く",
-      permissionLevel: CommandPermissionLevel.Admin,
-    },
-    /**
-     *
-     * @param {CustomCommandOrigin} ev
-     */
-    run: (ev) => {
-      system.run(() => {
-        const player = ev.sourceEntity;
-        settingForm(player);
       });
     },
   },
@@ -133,11 +94,12 @@ system.beforeEvents.startup.subscribe((e) => {
     if (world.getDynamicProperty(ids.countState)) {
       world.setDynamicProperty(ids.countState, false);
       doCount();
+
+      if (!world.getDynamicProperty(ids.notifyAutoResumeOnReload)) return;
       const intervalNum = system.runInterval(() => {
         const player = world.getAllPlayers();
         if (player.length > 0) {
-          world.getDynamicProperty(ids.notifyAutoResumeOnReload) &&
-            worldChat("自動でカウントが再開されました");
+          worldChat("自動でカウントが再開されました");
 
           system.clearRun(intervalNum);
         }
@@ -152,7 +114,7 @@ system.beforeEvents.startup.subscribe((e) => {
 function doCount() {
   // 重複実行対策
   if (world.getDynamicProperty(ids.countState)) {
-    return console.err("すでに実行されています");
+    return console.error("すでに実行されています");
   }
   world.setDynamicProperty(ids.countState, true);
   const countBoard = world.scoreboard.getObjective(ids.scoreboardId);
@@ -199,6 +161,45 @@ function conversionTime(rawNumber) {
   return result;
 }
 
+// メインメニューGUI定義
+async function menuForm(player) {
+  const form = new ActionFormData().title("計測くん");
+  form.label(
+    `現在の計測状況：${world.getDynamicProperty(ids.countState) ? "§a実行" : "§c停止"}`,
+  );
+  form.divider();
+  form.button("計測スタート・ストップ・再開");
+  form.button("現在タイムを確認");
+  form.button("設定");
+  form.button("計測をリセットする");
+
+  const res = await form.show(player);
+
+  if (res.canceled) return;
+
+  switch (res.selection) {
+    case 0:
+      if (world.getDynamicProperty(ids.countState)) {
+        stopCount();
+        worldChat("カウントストップしました");
+      } else {
+        doCount();
+        worldChat("カウントスタートしました");
+      }
+      break;
+    case 1:
+      countDataForm(player);
+      break;
+    case 2:
+      settingForm(player);
+      break;
+    case 3:
+      resetForm(player);
+
+      break;
+  }
+}
+
 // 設定GUI定義
 async function settingForm(player) {
   const form = new ModalFormData().title("計測くん");
@@ -223,17 +224,20 @@ async function resetForm(player) {
 
   const isTwoStepConfirmed = world.getDynamicProperty(ids.twoStepConfirmed);
 
-  form.label("");
+  form.divider();
   if (isTwoStepConfirmed) {
-    form.textField("リセットするには「reset」と入力してください。", "");
+    form.textField("リセットするには「reset」と入力してください。", "reset");
   }
-  form.submitButton("リセットする");
+  form.submitButton("計測をリセットする");
 
   const res = await form.show(player);
   if (res.canceled) return;
 
   if (isTwoStepConfirmed) {
-    if (res.formValues[0] !== "reset") return;
+    if (res.formValues[1] !== "reset") {
+      player.sendMessage(`失敗しました 入力された値：${res.formValues[1]}`);
+      return;
+    }
   }
 
   stopCount();
