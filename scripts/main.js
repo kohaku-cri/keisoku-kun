@@ -39,7 +39,7 @@ system.run(() => {
   }
 });
 
-// その他のグローバル変数さんたち
+// その他のグローバル変数さん
 const isDo = new Map();
 
 // カスタムコマンドの定義
@@ -165,13 +165,13 @@ function conversionTime(rawNumber) {
 async function menuForm(player) {
   const form = new ActionFormData().title("計測くん");
   form.label(
-    `現在の計測状況：${world.getDynamicProperty(ids.countState) ? "§a実行" : "§c停止"}`,
+    `現在のステータス：${world.getDynamicProperty(ids.countState) ? "§a実行中" : "§c停止中"}`,
   );
   form.divider();
   form.button("計測スタート・ストップ・再開");
   form.button("現在タイムを確認");
   form.button("設定");
-  form.button("計測をリセットする");
+  form.button("計測内容をリセットする");
 
   const res = await form.show(player);
 
