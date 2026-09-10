@@ -46,7 +46,7 @@ const isDo = new Map();
 const customCommand = [
   {
     command: {
-      name: `${ids.prefix}:menu`,
+      name: `${ids.prefix}:count`,
       description: "操作画面を開く",
       permissionLevel: CommandPermissionLevel.Admin,
     },
