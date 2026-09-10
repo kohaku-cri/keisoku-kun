@@ -142,9 +142,13 @@ async function countDataForm(player) {
   const form = new ActionFormData().title("計測くん");
   const countBoard = world.scoreboard.getObjective(ids.scoreboardId);
   const nowCount = countBoard.getScore(ids.scoreName);
+  form.label(
+    `計測ステータス：${world.getDynamicProperty(ids.countState) ? "§a実行中" : "§c停止中"}`,
+  );
+  form.divider()
   form.label("現在の計測時間");
   form.label(conversionTime(nowCount));
-  form.button("更新");
+  form.button("最新に更新");
 
   const res = await form.show(player);
   if (res.selection === 0) {
@@ -165,7 +169,7 @@ function conversionTime(rawNumber) {
 async function menuForm(player) {
   const form = new ActionFormData().title("計測くん");
   form.label(
-    `現在のステータス：${world.getDynamicProperty(ids.countState) ? "§a実行中" : "§c停止中"}`,
+    `計測ステータス：${world.getDynamicProperty(ids.countState) ? "§a実行中" : "§c停止中"}`,
   );
   form.divider();
   form.button("計測スタート・ストップ・再開");
