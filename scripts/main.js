@@ -253,7 +253,7 @@ async function resetForm(player) {
 async function correction(player) {
   const form = new ModalFormData().title("計測くん");
   const text = `このアドオンでは計測状況をスコアボードにより"１秒単位"で管理しています。
-計測時間を補正したいときはscoreboardコマンドを使用してください。
+計測内容を補正したいときはscoreboardコマンドを使用してください。
   
   スコアボードのID：${ids.scoreboardId}
   スコア名：${ids.scoreName}
