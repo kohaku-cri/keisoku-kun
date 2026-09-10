@@ -171,6 +171,7 @@ async function menuForm(player) {
   form.button("計測スタート・ストップ・再開");
   form.button("現在タイムを確認");
   form.button("設定");
+  form.button("時間補正の手引き");
   form.button("計測内容をリセットする");
 
   const res = await form.show(player);
@@ -194,8 +195,10 @@ async function menuForm(player) {
       settingForm(player);
       break;
     case 3:
+      correction(player);
+      break;
+    case 4:
       resetForm(player);
-
       break;
   }
 }
@@ -244,4 +247,28 @@ async function resetForm(player) {
   const countBoard = world.scoreboard.getObjective(ids.scoreboardId);
   countBoard.setScore(ids.scoreName, 0);
   worldChat("カウントリセットしました");
+}
+
+// 時間補正に関する情報
+async function correction(player) {
+  const form = new ModalFormData().title("計測くん");
+  const text = `このアドオンでは計測状況をスコアボードにより"１秒単位"で管理しています。
+計測時間を補正したいときはscoreboardコマンドを使用してください。
+  
+  スコアボードのID：${ids.scoreboardId}
+  スコア名：${ids.scoreName}
+  `;
+  const command = `/scoreboard players add ${ids.scoreName} ${ids.scoreboardId} 600`;
+
+  form.label(text);
+  form.textField(
+    "例えば現在の計測内容に１０分を加算したいときは次のようにします。",
+    "",
+    { defaultValue: command },
+  );
+
+  form.submitButton("戻る");
+  const res = await form.show(player);
+  if (res.canceled) return;
+  menuForm(player);
 }
