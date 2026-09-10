@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 こはく
+ * Copyright (c) 2026 kohaku_cri
  * MIT License
  * https://opensource.org/license/mit
  */
