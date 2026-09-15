@@ -40,7 +40,7 @@ system.run(() => {
 });
 
 // その他のグローバル変数さん
-const isDo = new Map();
+let intervalId;
 
 // カスタムコマンドの定義
 const customCommand = [
@@ -118,16 +118,16 @@ function doCount() {
   }
   world.setDynamicProperty(ids.countState, true);
   const countBoard = world.scoreboard.getObjective(ids.scoreboardId);
-  const intervalId = system.runInterval(() => {
+  const id = system.runInterval(() => {
     countBoard.addScore(ids.scoreName, 1);
   }, 20);
-  isDo.set("intervalId", intervalId);
+  intervalId = id;
 }
 
 // 時間のカウントをストップ
 function stopCount() {
   if (world.getDynamicProperty(ids.countState)) {
-    system.clearRun(isDo.get("intervalId"));
+    system.clearRun(intervalId);
     world.setDynamicProperty(ids.countState, false);
   }
 }
@@ -145,7 +145,7 @@ async function countDataForm(player) {
   form.label(
     `計測ステータス：${world.getDynamicProperty(ids.countState) ? "§a実行中" : "§c停止中"}`,
   );
-  form.divider()
+  form.divider();
   form.label("現在の計測時間");
   form.label(conversionTime(nowCount));
   form.button("最新に更新");
